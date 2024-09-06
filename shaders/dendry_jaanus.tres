@@ -100,7 +100,7 @@ void fragment() {
 	//col = vec3(hash22(cell.xy), 0.0);
 	
 	noise = (noise+0.5) * 0.6;
-	mindist = smoothstep(0.1, 0.5, mindist);
+	//mindist = smoothstep(0.1, 0.5, mindist);
 	
 	//col = vec3(mindist, noise, noise);
 	col = vec3(mindist);
