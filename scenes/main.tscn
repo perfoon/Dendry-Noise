@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://vuds1ojpn5oe"]
+[gd_scene load_steps=4 format=3 uid="uid://vuds1ojpn5oe"]
 
 [ext_resource type="Material" uid="uid://cpqtuityofseg" path="res://shaders/dendry_t0_base.tres" id="1_s3t0h"]
+[ext_resource type="Material" uid="uid://tg0eqr2qd47r" path="res://shaders/dendry_jaanus.tres" id="2_nnptl"]
+[ext_resource type="Material" uid="uid://c81i3h8q54its" path="res://shaders/dendry_jaanus_moore.tres" id="3_tv8he"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -10,7 +12,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Dendry v0" type="ColorRect" parent="."]
+[node name="Dendry t0 base" type="ColorRect" parent="."]
 material = ExtResource("1_s3t0h")
 layout_mode = 1
 anchors_preset = 15
@@ -19,13 +21,24 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ColorRect2" type="ColorRect" parent="."]
-material = ExtResource("1_s3t0h")
+[node name="Dendry Jaanus" type="ColorRect" parent="."]
+material = ExtResource("2_nnptl")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 544.0
 offset_right = 544.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dendry Jaanus moore" type="ColorRect" parent="."]
+material = ExtResource("3_tv8he")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1066.0
+offset_right = 1066.0
 grow_horizontal = 2
 grow_vertical = 2

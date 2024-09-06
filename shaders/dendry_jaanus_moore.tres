@@ -1,4 +1,4 @@
-[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://tg0eqr2qd47r"]
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://c81i3h8q54its"]
 
 [sub_resource type="Shader" id="Shader_is1ey"]
 code = "shader_type canvas_item;
@@ -23,13 +23,14 @@ float sdVector(in vec2 p, in vec2 v) {
 }
 
 vec3 noised2(vec2 p) {
+	return noised(p);
 	float amp = 1.0;
 	float freq = 1.0;
-	vec3 result = noised(p); 
-	for (int i = 1; i<5; i++) {
-		freq*= 1.43;
-		amp *= 0.9;
+	vec3 result = vec3(0.0);
+	for (int i = 0; i<1; i++) {
 		result += noised(p * freq) * amp;
+		freq*= 1.66;
+		amp *= 0.5;
 	}
 	
 	return result;
@@ -42,8 +43,8 @@ void fragment() {
 	vec4 cell = vec4(floor(p), fract(p));
 	//Local neighborhood 7x7
 	float mindist = 9999.0;
-	for (float ix = cell.x-1.; ix < cell.x+2.; ix += 1.) {
-		for (float iy = cell.y-1.; iy < cell.y+2.; iy += 1.) {
+	for (float ix = cell.x-3.; ix < cell.x+4.; ix += 1.) {
+		for (float iy = cell.y-3.; iy < cell.y+4.; iy += 1.) {
 			vec2 start_cell = vec2(ix, iy);
 			
 			vec2 dir = vec2(0, 0);
@@ -55,7 +56,7 @@ void fragment() {
 			//End of use direction vector
 			
 			//Use 3x3 moore neighborhood
-			/*
+		
 			float min_moore_val = 9.;
 			for (float ix2 = -1.; ix2 < 2.; ++ix2) {
 				for (float iy2 = -1.; iy2 < 2.; ++iy2) {
@@ -68,21 +69,20 @@ void fragment() {
 						}
 					}
 				}
-			*/
+			
 			//End of use 3x3 moore neighborhood
 			
 			vec2 start_point = hash22(start_cell) * jitter;
 			vec2 end_point = hash22(start_cell + dir) * jitter + dir;
 			
-			float dist = pow(sdVector(p - start_cell - start_point, end_point - start_point), (1.0 - clamp(grad.x+0.3, 0.0, 1.0)) );
+			float dist = sdVector(p - start_cell - start_point, end_point - start_point);
 			
 			if (dist < mindist) {
-				//vec2 end_grad = noised2((start_cell + dir) * control_noise_scale).yz;
+				//vec2 end_grad = noised((start_cell + dir) * control_noise_scale).yz;
 				mindist = dist;
-				/*
-				if (grad.x >= end_grad.x) {
-					mindist = dist;
-				}*/
+				//if (grad.x >= end_grad.x) {
+				//	mindist = dist;
+				//}
 			}
 		}
 	}
@@ -100,7 +100,7 @@ void fragment() {
 	//col = vec3(hash22(cell.xy), 0.0);
 	
 	noise = (noise+0.5) * 0.6;
-	mindist = smoothstep(0.1, 0.5, mindist);
+	//mindist = pow(mindist, 0.2);
 	
 	//col = vec3(mindist, noise, noise);
 	col = vec3(mindist);
@@ -127,4 +127,4 @@ void fragment() {
 shader = SubResource("Shader_is1ey")
 shader_parameter/scale = 100.0
 shader_parameter/control_noise_scale = 0.034
-shader_parameter/jitter = 0.752
+shader_parameter/jitter = 0.5
