@@ -1,0 +1,119 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://cpqtuityofseg"]
+
+[sub_resource type="Shader" id="Shader_dhbbq"]
+code = "shader_type canvas_item;
+render_mode blend_mix;
+
+#include \"res://shaders/noise_funcs.gdshaderinc\"
+
+uniform float scale = 20.0;
+uniform float control_noise_scale : hint_range(0.0, 0.3) = 0.17;
+uniform float jitter : hint_range(0.0, 1.0) = 0.5;
+
+float sdVerticalLine(in vec2 p, in float h) {
+    return length(vec2(p.x, p.y - h * clamp(p.y / h, 0.0, 1.0)));
+}
+//https://www.shadertoy.com/view/wsVfzc
+float sdVector(in vec2 p, in vec2 v) {
+    float m = length(v);
+    vec2 n = v / m;
+    p = vec2(dot(p, vec2(n.y, -n.x)), dot(p, n));
+	//vec2 dir = vec2(p.x, p.y - m * clamp(p.y / m, 0.0, 1.0));
+    return sdVerticalLine(p, m);
+}
+
+void fragment() {
+	vec2 p = UV * scale;// + TIME*0.1;
+	vec3 col = vec3(0.0);
+
+	vec4 cell = vec4(floor(p), fract(p));
+	//Local neighborhood 7x7
+	float mindist = 9999.0;
+	for (float ix = cell.x-3.; ix < cell.x+4.; ix += 1.) {
+		for (float iy = cell.y-3.; iy < cell.y+4.; iy += 1.) {
+			vec2 start_cell = vec2(ix, iy);
+			
+			vec2 dir = vec2(0, 0);
+			//use direction vector
+			/*
+			vec3 grad = noised(start_cell * control_noise_scale);
+			dir = -clamp(grad.yz * max(abs(grad.yz)-0.5*abs(grad.zy), 0.0) * 999999.0, vec2(-1.), vec2(1.));
+			*/
+			//End of use direction vector
+			
+			//Use 3x3 moore neighborhood
+			float min_moore_val = 9.;
+			for (float ix2 = -1.; ix2 < 2.; ++ix2) {
+				for (float iy2 = -1.; iy2 < 2.; ++iy2) {
+						vec2 moore = vec2(ix+ix2, iy+iy2);
+						moore += hash22(moore) * jitter; //jitter for connection
+						float moore_val = noised(moore * control_noise_scale).x;
+						if (moore_val < min_moore_val) {
+							min_moore_val = moore_val;
+							dir = vec2(ix2, iy2);
+						}
+					}
+				}
+			//End of use 3x3 moore neighborhood
+			
+			vec2 start_point = hash22(start_cell) * jitter;
+			vec2 end_point = hash22(start_cell + dir) * jitter + dir;
+			
+			float dist = sdVector(p - start_cell - start_point, end_point - start_point);
+			
+			if (dist < mindist) {
+				//vec2 end_grad = noised((start_cell + dir) * control_noise_scale).yz;
+				mindist = dist;
+				//if (grad.x >= end_grad.x) {
+				//	mindist = dist;
+				//}
+			}
+		}
+	}
+	
+	
+	//float vector = sdVector(cell.zw, vec2(2.0, 2.0));
+	//col = vec3(noised(p).r + 0.5);
+	float noise = noised(cell.xy * control_noise_scale).x;
+	vec2 grad = noised(cell.xy * control_noise_scale).yz;
+	
+	vec2 dir = clamp(grad * max(abs(grad)-0.5*abs(grad.yx), 0.0) * 999999.0, vec2(-1.), vec2(1.));
+	col = vec3(dir * 0.5 + 0.5, 0.0);
+	
+	float point = length(cell.zw - hash22(cell.xy));
+	//col = vec3(hash22(cell.xy), 0.0);
+	
+	noise = (noise+0.5) * 0.6;
+	//mindist = pow(mindist, 0.2);
+	
+	//col = vec3(mindist, noise, noise);
+	col = vec3(mindist);
+
+	COLOR = vec4(col, 1.0);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"
+
+[resource]
+shader = SubResource("Shader_dhbbq")
+shader_parameter/scale = 20.0
+shader_parameter/control_noise_scale = 0.18
+shader_parameter/jitter = 0.5
