@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://vuds1ojpn5oe"]
 
-[ext_resource type="Material" uid="uid://cpqtuityofseg" path="res://shaders/dendry_v1.tres" id="1_s3t0h"]
+[ext_resource type="Material" uid="uid://cpqtuityofseg" path="res://shaders/dendry_t0_base.tres" id="1_s3t0h"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -10,11 +10,22 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="Dendry v0" type="ColorRect" parent="."]
 material = ExtResource("1_s3t0h")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect2" type="ColorRect" parent="."]
+material = ExtResource("1_s3t0h")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 544.0
+offset_right = 544.0
 grow_horizontal = 2
 grow_vertical = 2
