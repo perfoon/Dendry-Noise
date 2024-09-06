@@ -1,6 +1,6 @@
-[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://cpqtuityofseg"]
+[gd_resource type="Shader" format=3 uid="uid://dcj7nujrdpa5"]
 
-[sub_resource type="Shader" id="Shader_dhbbq"]
+[resource]
 code = "shader_type canvas_item;
 render_mode blend_mix;
 
@@ -105,15 +105,4 @@ void fragment() {
 
 
 
-
-
-
-
-
 "
-
-[resource]
-shader = SubResource("Shader_dhbbq")
-shader_parameter/scale = 20.0
-shader_parameter/control_noise_scale = 0.18
-shader_parameter/jitter = 0.5

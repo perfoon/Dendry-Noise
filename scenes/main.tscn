@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://vuds1ojpn5oe"]
 
-[ext_resource type="Material" uid="uid://cpqtuityofseg" path="res://shaders/dendry.tres" id="1_s3t0h"]
+[ext_resource type="Material" uid="uid://cpqtuityofseg" path="res://shaders/dendry_material.tres" id="1_s3t0h"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
