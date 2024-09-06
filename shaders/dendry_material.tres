@@ -1,9 +1,0 @@
-[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://cpqtuityofseg"]
-
-[ext_resource type="Shader" uid="uid://dcj7nujrdpa5" path="res://shaders/dendry.tres" id="1_q7gcj"]
-
-[resource]
-shader = ExtResource("1_q7gcj")
-shader_parameter/scale = 20.0
-shader_parameter/control_noise_scale = 0.18
-shader_parameter/jitter = 0.5

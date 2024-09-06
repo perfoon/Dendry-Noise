@@ -1,6 +1,6 @@
-[gd_resource type="Shader" format=3 uid="uid://dcj7nujrdpa5"]
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://cpqtuityofseg"]
 
-[resource]
+[sub_resource type="Shader" id="Shader_is1ey"]
 code = "shader_type canvas_item;
 render_mode blend_mix;
 
@@ -46,7 +46,7 @@ void fragment() {
 			for (float ix2 = -1.; ix2 < 2.; ++ix2) {
 				for (float iy2 = -1.; iy2 < 2.; ++iy2) {
 						vec2 moore = vec2(ix+ix2, iy+iy2);
-						moore += hash22(moore) * jitter; //jitter for connection
+						moore += hash22(moore) * jitter;
 						float moore_val = noised(moore * control_noise_scale).x;
 						if (moore_val < min_moore_val) {
 							min_moore_val = moore_val;
@@ -106,3 +106,9 @@ void fragment() {
 
 
 "
+
+[resource]
+shader = SubResource("Shader_is1ey")
+shader_parameter/scale = 20.0
+shader_parameter/control_noise_scale = 0.17
+shader_parameter/jitter = 0.5
