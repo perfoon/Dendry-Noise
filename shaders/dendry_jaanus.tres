@@ -10,16 +10,11 @@ uniform float scale = 20.0;
 uniform float control_noise_scale : hint_range(0.0, 0.3) = 0.17;
 uniform float jitter : hint_range(0.0, 1.0) = 0.5;
 
-float sdVerticalLine(in vec2 p, in float h) {
-    return length(vec2(p.x, p.y - h * clamp(p.y / h, 0.0, 1.0)));
-}
-//https://www.shadertoy.com/view/wsVfzc
-float sdVector(in vec2 p, in vec2 v) {
-    float m = length(v);
-    vec2 n = v / m;
-    p = vec2(dot(p, vec2(n.y, -n.x)), dot(p, n));
-	//vec2 dir = vec2(p.x, p.y - m * clamp(p.y / m, 0.0, 1.0));
-    return sdVerticalLine(p, m);
+vec2 sdVector(in vec2 p, in vec2 v) {
+	float vp = dot(v, -p);
+	float vv = dot(v, v);
+	float t = clamp(-vp / vv, 0., 1.);
+	return t * v - p;
 }
 
 vec3 noised2(vec2 p) {
@@ -37,61 +32,36 @@ vec3 noised2(vec2 p) {
 }
 
 void fragment() {
-	vec2 p = UV * scale;// + TIME;
 	vec3 col = vec3(0.0);
 
+	float mult = 1.0;
+	vec2 p = UV * scale * mult;// + TIME;
 	vec4 cell = vec4(floor(p), fract(p));
+	
 	//Local neighborhood 7x7
-	float mindist = 9999.0;
+	vec2 minddistvec = vec2(9999.9, 9999.9);
 	for (float ix = cell.x-2.; ix < cell.x+3.; ix += 1.) {
 		for (float iy = cell.y-2.; iy < cell.y+3.; iy += 1.) {
 			vec2 start_cell = vec2(ix, iy);
 			
-			vec2 dir = vec2(0, 0);
-			//use direction vector
-		
-			vec3 grad = noised2(start_cell * control_noise_scale);
-			dir = -clamp(grad.yz * max(abs(grad.yz)-0.5*abs(grad.zy), 0.0) * 999999.0, vec2(-1.), vec2(1.));
-			
-			//End of use direction vector
-			
-			//Use 3x3 moore neighborhood
-			/*
-			float min_moore_val = 9.;
-			for (float ix2 = -1.; ix2 < 2.; ++ix2) {
-				for (float iy2 = -1.; iy2 < 2.; ++iy2) {
-						vec2 moore = vec2(ix+ix2, iy+iy2);
-						moore += hash22(moore) * jitter;
-						float moore_val = noised2(moore * control_noise_scale).x;
-						if (moore_val < min_moore_val) {
-							min_moore_val = moore_val;
-							dir = vec2(ix2, iy2);
-						}
-					}
-				}
-			*/
-			//End of use 3x3 moore neighborhood
+			vec3 grad = noised(start_cell * control_noise_scale / scale * 100. / mult);
+			vec2 dir = -clamp(grad.yz * max(abs(grad.yz)-0.5*abs(grad.zy), 0.0) * 999999.0, vec2(-1.), vec2(1.));
 			
 			vec2 start_point = hash22(start_cell) * jitter;
 			vec2 end_point = hash22(start_cell + dir) * jitter + dir;
 			
-			
-			float dist = sdVector(p - start_cell - start_point, end_point - start_point);
-			float width = mod(start_cell.x, 2.0) * 0.5 + 0.5;
-			
-			dist = pow(dist, width);
-			
-			if (dist < mindist) {
-				//vec2 end_grad = noised2((start_cell + dir) * control_noise_scale).yz;
-				mindist = dist;
-				/*
-				if (grad.x >= end_grad.x) {
-					mindist = dist;
-				}*/
+			vec2 dist_vec = sdVector(p - start_cell - start_point, end_point - start_point);
+			//float width = mod(start_cell.x, 2.0) * 0.5 + 0.5;	
+			//dist = pow(dist, width);		
+			if (dot(dist_vec, dist_vec) < dot(minddistvec, minddistvec)) {
+				minddistvec = dist_vec;
 			}
 		}
 	}
 	
+	//mindist = length(minddistvec);
+	//mindist = sqrt(dot(minddistvec, minddistvec));
+	float mindist = length(minddistvec);
 	
 	//float vector = sdVector(cell.zw, vec2(2.0, 2.0));
 	//col = vec3(noised(p).r + 0.5);
@@ -107,8 +77,8 @@ void fragment() {
 	noise = (noise+0.5) * 0.6;
 	//mindist = smoothstep(0.1, 0.5, mindist);
 	
-	//col = vec3(mindist, noise, noise);
 	col = vec3(mindist);
+	//col = vec3(minddistvec.x*0.5+0.5, minddistvec.y*0.5 + 0.5, 0.0);
 
 	COLOR = vec4(col, 1.0);
 }
@@ -132,4 +102,4 @@ void fragment() {
 shader = SubResource("Shader_is1ey")
 shader_parameter/scale = 100.0
 shader_parameter/control_noise_scale = 0.034
-shader_parameter/jitter = 0.0
+shader_parameter/jitter = 0.591
