@@ -11,23 +11,20 @@ uniform float control_noise_scale : hint_range(0.0, 0.3) = 0.17;
 uniform float jitter : hint_range(0.0, 1.0) = 0.5;
 
 vec2 sdVector(in vec2 p, in vec2 v) {
-	float vp = dot(v, -p);
-	float vv = dot(v, v);
-	float t = clamp(-vp / vv, 0., 1.);
-	return t * v - p;
+	return clamp(dot(v, p) / dot(v, v), 0., 1.) * v - p;
 }
 
 vec3 noised2(vec2 p) {
 	float amp = 1.0;
 	float freq = 1.0;
 	vec3 result = noised(p);
-	/*
+
 	for (int i = 1; i<5; i++) {
 		freq*= 1.43;
 		amp *= 0.9;
 		result += noised(p * freq) * amp;
 	}
-	*/
+	
 	return result;
 }
 
@@ -39,7 +36,7 @@ void fragment() {
 	vec4 cell = vec4(floor(p), fract(p));
 	
 	//Local neighborhood 7x7
-	vec2 minddistvec = vec2(9999.9, 9999.9);
+	vec2 minddistvec = vec2(9999., 9999.);
 	for (float ix = cell.x-2.; ix < cell.x+3.; ix += 1.) {
 		for (float iy = cell.y-2.; iy < cell.y+3.; iy += 1.) {
 			vec2 start_cell = vec2(ix, iy);
@@ -50,12 +47,33 @@ void fragment() {
 			vec2 start_point = hash22(start_cell) * jitter;
 			vec2 end_point = hash22(start_cell + dir) * jitter + dir;
 			
-			vec2 dist_vec = sdVector(p - start_cell - start_point, end_point - start_point);
-			//float width = mod(start_cell.x, 2.0) * 0.5 + 0.5;	
-			//dist = pow(dist, width);		
+			vec2 dist_vec = sdVector(p - start_cell - start_point, end_point - start_point);	
+			
 			if (dot(dist_vec, dist_vec) < dot(minddistvec, minddistvec)) {
 				minddistvec = dist_vec;
 			}
+			
+		
+			//T1
+			start_point = hash22(start_cell + 3.3) * jitter;
+			dist_vec = sdVector(p - start_cell - start_point, dist_vec * 9999.);	
+			if (dot(dist_vec, dist_vec) < dot(minddistvec, minddistvec)) {
+				minddistvec = dist_vec;
+			}
+			/*
+			start_point = hash22(start_cell + 4.3) * jitter;
+			dist_vec = sdVector(p - start_cell - start_point, dist_vec * 9999.);	
+			if (dot(dist_vec, dist_vec) < dot(minddistvec, minddistvec)) {
+				minddistvec = dist_vec;
+			}
+			
+			start_point = hash22(start_cell + 6.3) * jitter;
+			dist_vec = sdVector(p - start_cell - start_point, dist_vec * 9999.);	
+			if (dot(dist_vec, dist_vec) < dot(minddistvec, minddistvec)) {
+				minddistvec = dist_vec;
+			}
+			*/
+			
 		}
 	}
 	
@@ -100,6 +118,6 @@ void fragment() {
 
 [resource]
 shader = SubResource("Shader_is1ey")
-shader_parameter/scale = 100.0
+shader_parameter/scale = 40.0
 shader_parameter/control_noise_scale = 0.034
-shader_parameter/jitter = 0.591
+shader_parameter/jitter = 1.0
